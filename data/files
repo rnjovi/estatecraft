@@ -1,0 +1,4 @@
+ ├── scraper.py        # Main scraper code
+│   ├── utils.py          # Utility functions
+│   ├── requirements.txt  # List of Python dependencies
+│   └── .gitignore        # Git ignore file
