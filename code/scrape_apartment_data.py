@@ -17,6 +17,13 @@ def scrape_apartment_data(id):
             info = default
         return info
 
+    def extract_link(soup, search_term, default='-'):
+        try:
+            info = soup.find('div', string=search_term).find_next_sibling('div').find('a')['href']
+        except (AttributeError, TypeError):
+            info = default
+        return info
+
     apartment_info = []
 
     address = extract_info(soup, 'Sijainti', '-')
@@ -67,6 +74,9 @@ def scrape_apartment_data(id):
 
     for elem in apartment_info:
         print(elem)
+
+    link = "https://www.etuovi.com/" + extract_link(soup, 'Taloyhtiön nimi')
+    print(link)
 
 if __name__ == '__main__':
     ids = get_apartment_ids()
