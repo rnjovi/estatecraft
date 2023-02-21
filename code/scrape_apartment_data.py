@@ -78,10 +78,37 @@ def scrape_apartment_data(id):
     link = "https://www.etuovi.com/" + extract_link(soup, 'Taloyhtiön nimi')
     print(link)
 
+
 if __name__ == '__main__':
     ids = get_apartment_ids()
 
     data = scrape_apartment_data(ids[0])
+
+    url = "https://www.etuovi.com/myytavat-asunnot/pirkkala/loukonlahti/taloyhtiot/0218164-2/asunto-oy-korkeakallio"
+
+    # Send a request to the URL and get the response
+    response = requests.get(url)
+
+    # Parse the HTML content of the response using BeautifulSoup
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find all div elements with class "MobileTable__row__1xkd0"
+    rows = soup.find_all('div', {'class': 'MobileTable__row__1xkd0'})
+
+    # Create an empty 2D list to store the scraped data
+    data = []
+
+    # Loop through each row and scrape the values
+    for row in rows:
+        # Find all div elements with class "MobileTable__alwaysVisibleCells__YQGaa" in the current row
+        cells = row.find_all('div', {'class': 'MobileTable__alwaysVisibleCells__YQGaa'})
+        
+        # Extract the values from the cells and append them to the data list
+        row_data = [cell.text.strip() for cell in cells]
+        data.append(row_data)
+        
+    # Print the scraped data
+    print(data)
 
     """
     for id in ids:
