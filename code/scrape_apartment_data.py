@@ -5,7 +5,7 @@ from database import Database
 
 
 # Create a new database connection
-db = Database(dbname="real_estate_info", user="postgres", password=SECRET_PASSWORD)
+db = Database(dbname="real_estate_info", user="postgres", password="new_password")
 
 
 def create_table():
