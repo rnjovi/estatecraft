@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 def get_apartment_ids():
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
-    query_string = 'haku=M1946406847'
+    query_string = 'haku=M1954069489'
     current_page = 1
 
     ids = []
@@ -13,10 +13,11 @@ def get_apartment_ids():
         url = f"{base_url}?{query_string}&sivu={current_page}"
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
-        links = soup.find_all('a', {'class': 'AnnouncementCard__CardLink-sc-xmfue4-1 dnspFg'})
+        links = soup.find_all('div', {'class': 'ListPage__cardContainer__39dKQ'})
 
         for link in links:
-            id = link['id']
+            link2 = link.find('a', {'class': 'mui-style-58tli6 e12nd9f313'})
+            id = link2.get('id')
             if id in all_ids:
                 continue
             ids.append(id)

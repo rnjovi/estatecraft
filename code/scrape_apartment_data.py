@@ -14,7 +14,7 @@ def create_table():
 
     # Creates table
     db.execute('''CREATE TABLE apartments
-            (id INTEGER PRIMARY KEY,
+            (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
             type TEXT,
             price TEXT,
@@ -62,7 +62,7 @@ def scrape_apartment_data(id):
                 info = default
             return info
 
-        id = int(id)
+        id = id
         address = extract_info(soup, 'Sijainti', '-')
         type = extract_info(soup, 'Tyyppi', '-')
         price = extract_info(soup, 'Velaton hinta', '-')
@@ -99,7 +99,7 @@ def scrape_apartment_data(id):
 def save_data(apartment_info):
     query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, link)
          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
-    db.execute(query, apartment_info)
+    db.execute(query, *apartment_info)
 
 def view_table():
     # Create a cursor
@@ -124,13 +124,13 @@ if __name__ == '__main__':
     ids = get_apartment_ids()
 
     # Only for 1 card
-    data = scrape_apartment_data(ids[0])
+    # data = scrape_apartment_data(ids[0])
     # For all cards
-    """
+    
     for id in ids:
             data = scrape_apartment_data(id)
             print()
-    """
+    
     create_table()
     save_data(data)
     view_table()
