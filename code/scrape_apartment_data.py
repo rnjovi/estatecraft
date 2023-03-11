@@ -123,14 +123,16 @@ def view_table():
 if __name__ == '__main__':
     ids = get_apartment_ids()
 
+    create_table()
+
     # Only for 1 card
     # data = scrape_apartment_data(ids[0])
     # For all cards
-    
+    c = 1
     for id in ids:
             data = scrape_apartment_data(id)
-            print()
+            save_data(data)
+            print(c)
+            c = c + 1
     
-    create_table()
-    save_data(data)
     view_table()
