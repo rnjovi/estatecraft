@@ -101,12 +101,12 @@ def save_data(apartment_info):
          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     db.execute(query, *apartment_info)
 
-def view_table():
+def sql_query(query):
     # Create a cursor
     cur = db.conn.cursor()
 
-    # Execute a SELECT statement
-    cur.execute("SELECT * FROM apartments")
+    # Execute statement
+    cur.execute(query)
 
     # Fetch all rows
     rows = cur.fetchall()
@@ -117,8 +117,7 @@ def view_table():
 
     # Close the cursor and the database connection
     cur.close()
-    db.conn.close()
-    
+    db.conn.close() 
 
 if __name__ == '__main__':
     ids = get_apartment_ids()
@@ -135,4 +134,4 @@ if __name__ == '__main__':
             print(c)
             c = c + 1
     
-    view_table()
+    sql_query("SELECT * FROM apartmens")
