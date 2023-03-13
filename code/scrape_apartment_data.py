@@ -9,11 +9,13 @@ db = Database(dbname="real_estate_info", user="postgres", password="new_password
 
 
 def create_table():
+
+    # Saved table apartments for testing. It contains all finnish apartments for sale
     # Drops table for testing purposes.
-    db.execute("DROP TABLE apartments")
+    db.execute("DROP TABLE apartments_test")
 
     # Creates table
-    db.execute('''CREATE TABLE apartments
+    db.execute('''CREATE TABLE apartments_test
             (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
             type TEXT,
@@ -85,11 +87,11 @@ def scrape_apartment_data(id):
         ownership_type = extract_info(soup, 'Tontin omistus', '-')
         renovation_info = extract_info(soup, 'Tehdyt remontit', '-')
         future_renovations = extract_info(soup, 'Tulevat remontit', '-')
-        link = "https://www.etuovi.com/" + extract_link(soup, 'Taloyhtiön nimi')
+        housing_company_link = "https://www.etuovi.com/" + extract_link(soup, 'Taloyhtiön nimi')
 
         apartment_info = (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, 
         selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system,
-        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, link)
+        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_link)
         return apartment_info
 
     except Exception as e:
@@ -134,4 +136,4 @@ if __name__ == '__main__':
             print(c)
             c = c + 1
     
-    sql_query("SELECT * FROM apartmens")
+    sql_query("SELECT * FROM apartments")
