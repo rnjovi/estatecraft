@@ -1,4 +1,6 @@
 import requests
+import lxml
+import cchardet
 from bs4 import BeautifulSoup
 from scrape_apartment_ids import get_apartment_ids
 from database import Database
@@ -9,13 +11,11 @@ db = Database(dbname="real_estate_info", user="postgres", password="new_password
 
 
 def create_table():
-
-    # Saved table apartments for testing. It contains all finnish apartments for sale
     # Drops table for testing purposes.
-    db.execute("DROP TABLE apartments_test")
+    db.execute("DROP TABLE apartments")
 
     # Creates table
-    db.execute('''CREATE TABLE apartments_test
+    db.execute('''CREATE TABLE apartments
             (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
             type TEXT,
@@ -46,7 +46,7 @@ def scrape_apartment_data(id):
     try:
         url = f"https://www.etuovi.com/kohde/{id}"
         response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, 'lxml')
 
         # scrape the data you need using the BeautifulSoup functions
 
@@ -136,4 +136,4 @@ if __name__ == '__main__':
             print(c)
             c = c + 1
     
-    sql_query("SELECT * FROM apartments")
+    # sql_query("SELECT * FROM apartments")
