@@ -21,9 +21,9 @@ def create_table():
             (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
             type TEXT,
-            price TEXT,
+            price FLOAT,
             apartment_layout TEXT,
-            living_area TEXT,
+            living_area FLOAT,
             floors TEXT,
             year_of_construction TEXT,
             selling_price TEXT,
@@ -41,7 +41,7 @@ def create_table():
             ownership_type TEXT,
             renovation_info TEXT,
             future_renovations TEXT,
-            link TEXT)''')
+            housing_company_url TEXT)''')
 
     
 def scrape_apartment_data(id):
@@ -52,7 +52,7 @@ def scrape_apartment_data(id):
 
         # scrape the data you need using the BeautifulSoup functions
 
-        def extract_info(soup, search_term, default='-'):
+        def extract_info(soup, search_term, default=None):
             try:
                 info = soup.find('div', string=search_term).find_next_sibling('div').text.strip()
             except AttributeError:
@@ -62,38 +62,53 @@ def scrape_apartment_data(id):
         def extract_link(soup, search_term, default='-'):
             try:
                 info = soup.find('div', string=search_term).find_next_sibling('div').find('a')['href']
+                info = "https://www.etuovi.com/" +  info
             except (AttributeError, TypeError):
                 info = default
             return info
 
+        def convert_currency(currency_str):
+            cleaned_str = currency_str.replace('\xa0', '').replace(',', '.').replace('€', '').strip()
+            return float(cleaned_str)
+
+        def convert_area(area_str):
+            cleaned_str = area_str.replace(',','.')
+            cleaned_str = cleaned_str.split(" ")[0]
+            return float(cleaned_str)
+        
         id = id
-        address = extract_info(soup, 'Sijainti', '-')
-        type = extract_info(soup, 'Tyyppi', '-')
-        price = extract_info(soup, 'Velaton hinta', '-')
-        apartment_layout = extract_info(soup, 'Huoneistoselitelmä', '-')
-        living_area = extract_info(soup, 'Asuintilojen pinta-ala', '-')
-        floors = extract_info(soup, 'Kerrokset', '-')
-        year_of_construction = extract_info(soup, 'Rakennusvuosi', '-')
-        selling_price = extract_info(soup, 'Myyntihinta', '-')
+        address = extract_info(soup, 'Sijainti', None)
+        type = extract_info(soup, 'Tyyppi', None)
+
+        price = extract_info(soup, 'Velaton hinta', '0')
+        price = convert_currency(price)
+        apartment_layout = extract_info(soup, 'Huoneistoselitelmä', None)
+
+        living_area = extract_info(soup, 'Asuintilojen pinta-ala', '0')
+        living_area = convert_area(living_area)
+
+        floors = extract_info(soup, 'Kerrokset', None)
+        year_of_construction = extract_info(soup, 'Rakennusvuosi', None)
+        selling_price = extract_info(soup, 'Myyntihinta', None)
         debt_share = extract_info(soup, 'Velkaosuus', '0')
-        maintenance_fee = extract_info(soup, 'Hoitovastike', '-')
+        maintenance_fee = extract_info(soup, 'Hoitovastike', None)
         financing_fee = extract_info(soup, 'Rahoitusvastike', '0')
-        sauna = extract_info(soup, 'Sauna', '-')
-        balcony = extract_info(soup, 'Parveke', '-')
+        sauna = extract_info(soup, 'Sauna', None)
+        balcony = extract_info(soup, 'Parveke', None)
         elevator = extract_info(soup, 'Hissi', 'Ei hissiä')
-        condition = extract_info(soup, 'Asunnon kunto', '-')
-        heating_system = extract_info(soup, 'Lämmitysjärjestelmän kuvaus', '-')
-        housing_company = extract_info(soup, 'Taloyhtiön nimi', '-')
-        energy_class = extract_info(soup, 'Energialuokka', '-')
-        lot_size = extract_info(soup, 'Tontin koko', '-')
-        ownership_type = extract_info(soup, 'Tontin omistus', '-')
-        renovation_info = extract_info(soup, 'Tehdyt remontit', '-')
-        future_renovations = extract_info(soup, 'Tulevat remontit', '-')
-        housing_company_link = "https://www.etuovi.com/" + extract_link(soup, 'Taloyhtiön nimi')
+        condition = extract_info(soup, 'Asunnon kunto', None)
+        heating_system = extract_info(soup, 'Lämmitysjärjestelmän kuvaus', None)
+        housing_company = extract_info(soup, 'Taloyhtiön nimi', None)
+        energy_class = extract_info(soup, 'Energialuokka', None)
+        lot_size = extract_info(soup, 'Tontin koko', None)
+        ownership_type = extract_info(soup, 'Tontin omistus', None)
+        renovation_info = extract_info(soup, 'Tehdyt remontit', None)
+        future_renovations = extract_info(soup, 'Tulevat remontit', None)
+        housing_company_url = extract_link(soup, 'Taloyhtiön nimi')
 
         apartment_info = (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, 
         selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system,
-        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_link)
+        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url)
         return apartment_info
 
     except Exception as e:
@@ -101,7 +116,7 @@ def scrape_apartment_data(id):
 
 
 def save_data(apartment_info):
-    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, link)
+    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url)
          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     db.execute(query, *apartment_info)
 
