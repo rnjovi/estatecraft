@@ -3,6 +3,7 @@ import pstats
 import requests
 import lxml
 import cchardet
+import datetime
 from bs4 import BeautifulSoup
 from scrape_apartment_ids import get_apartment_ids
 from database import Database
@@ -25,11 +26,11 @@ def create_table():
             apartment_layout TEXT,
             living_area FLOAT,
             floors TEXT,
-            year_of_construction TEXT,
-            selling_price TEXT,
-            debt_share TEXT,
-            maintenance_fee TEXT,
-            financing_fee TEXT,
+            year_of_construction INT,
+            selling_price FLOAT,
+            debt_share FLOAT,
+            maintenance_fee FLOAT,
+            financing_fee FLOAT,
             sauna TEXT,
             balcony TEXT,
             elevator TEXT,
@@ -41,7 +42,8 @@ def create_table():
             ownership_type TEXT,
             renovation_info TEXT,
             future_renovations TEXT,
-            housing_company_url TEXT)''')
+            housing_company_url TEXT,
+            date TEXT)''')
 
     
 def scrape_apartment_data(id):
@@ -72,9 +74,18 @@ def scrape_apartment_data(id):
             return float(cleaned_str)
 
         def convert_area(area_str):
-            cleaned_str = area_str.replace(',','.')
-            cleaned_str = cleaned_str.split(" ")[0]
+            cleaned_str = area_str.split(" ")[0]
+            cleaned_str = cleaned_str.replace(',','.')
             return float(cleaned_str)
+        
+        def convert_fee(price_str):
+            price_str = price_str.split(" ")[0]  # remove the "/ kk" part
+            price_float = float(price_str.replace("\xa0€", "").replace(",", "."))
+            return price_float
+        
+        def convert_to_int(string):
+            result = int(''.join(filter(str.isdigit, string)))
+            return result
         
         id = id
         address = extract_info(soup, 'Sijainti', None)
@@ -88,11 +99,20 @@ def scrape_apartment_data(id):
         living_area = convert_area(living_area)
 
         floors = extract_info(soup, 'Kerrokset', None)
-        year_of_construction = extract_info(soup, 'Rakennusvuosi', None)
-        selling_price = extract_info(soup, 'Myyntihinta', None)
+        year_of_construction = extract_info(soup, 'Rakennusvuosi', '0')
+        year_of_construction = convert_to_int(year_of_construction)
+
+        selling_price = extract_info(soup, 'Myyntihinta', '0')
+        selling_price = convert_currency(selling_price)
         debt_share = extract_info(soup, 'Velkaosuus', '0')
-        maintenance_fee = extract_info(soup, 'Hoitovastike', None)
+        debt_share = convert_currency(debt_share)
+
+        maintenance_fee = extract_info(soup, 'Hoitovastike', '0')
+        maintenance_fee = convert_fee(maintenance_fee)
+        
         financing_fee = extract_info(soup, 'Rahoitusvastike', '0')
+        financing_fee  = convert_fee(financing_fee)
+
         sauna = extract_info(soup, 'Sauna', None)
         balcony = extract_info(soup, 'Parveke', None)
         elevator = extract_info(soup, 'Hissi', 'Ei hissiä')
@@ -105,10 +125,11 @@ def scrape_apartment_data(id):
         renovation_info = extract_info(soup, 'Tehdyt remontit', None)
         future_renovations = extract_info(soup, 'Tulevat remontit', None)
         housing_company_url = extract_link(soup, 'Taloyhtiön nimi')
+        date = datetime.date.today()
 
         apartment_info = (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, 
         selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system,
-        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url)
+        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url, date)
         return apartment_info
 
     except Exception as e:
@@ -116,8 +137,8 @@ def scrape_apartment_data(id):
 
 
 def save_data(apartment_info):
-    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url)
-         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url, date)
+         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     db.execute(query, *apartment_info)
 
 def sql_query(query):
