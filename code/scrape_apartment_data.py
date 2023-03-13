@@ -42,8 +42,9 @@ def create_table():
             ownership_type TEXT,
             renovation_info TEXT,
             future_renovations TEXT,
-            housing_company_url TEXT,
-            date TEXT)''')
+            housing_company_id VARCHAR(10),
+            date TEXT
+            )''')
 
     
 def scrape_apartment_data(id):
@@ -64,28 +65,22 @@ def scrape_apartment_data(id):
         def extract_link(soup, search_term, default='-'):
             try:
                 info = soup.find('div', string=search_term).find_next_sibling('div').find('a')['href']
-                info = "https://www.etuovi.com/" +  info
+                info = info.split("/")
             except (AttributeError, TypeError):
                 info = default
-            return info
+            return info[-1]
 
         def convert_currency(currency_str):
-            cleaned_str = currency_str.replace('\xa0', '').replace(',', '.').replace('€', '').strip()
-            return float(cleaned_str)
+            return float(currency_str.translate(str.maketrans('', '', '\xa0,€')).strip())
 
         def convert_area(area_str):
-            cleaned_str = area_str.split(" ")[0]
-            cleaned_str = cleaned_str.replace(',','.')
-            return float(cleaned_str)
+            return float(area_str.split(" ")[0].replace(',', '.'))
         
         def convert_fee(price_str):
-            price_str = price_str.split(" ")[0]  # remove the "/ kk" part
-            price_float = float(price_str.replace("\xa0€", "").replace(",", "."))
-            return price_float
+            return float(price_str.split(" ")[0].replace("\xa0€", "").replace(",", "."))
         
         def convert_to_int(string):
-            result = int(''.join(filter(str.isdigit, string)))
-            return result
+            return int(''.join(filter(str.isdigit, string)))
         
         id = id
         address = extract_info(soup, 'Sijainti', None)
@@ -124,12 +119,12 @@ def scrape_apartment_data(id):
         ownership_type = extract_info(soup, 'Tontin omistus', None)
         renovation_info = extract_info(soup, 'Tehdyt remontit', None)
         future_renovations = extract_info(soup, 'Tulevat remontit', None)
-        housing_company_url = extract_link(soup, 'Taloyhtiön nimi')
+        housing_company_id = extract_link(soup, 'Taloyhtiön nimi')
         date = datetime.date.today()
 
         apartment_info = (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, 
         selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system,
-        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url, date)
+        housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_id, date)
         return apartment_info
 
     except Exception as e:
@@ -137,7 +132,7 @@ def scrape_apartment_data(id):
 
 
 def save_data(apartment_info):
-    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_url, date)
+    query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_id, date)
          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     db.execute(query, *apartment_info)
 
