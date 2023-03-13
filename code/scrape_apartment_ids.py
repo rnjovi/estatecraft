@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 def get_apartment_ids():
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
-    query_string = 'haku=M1954069489'
+    query_string = 'haku=M1954707357'
     current_page_num = 1
 
     unique_ids = set()
@@ -17,8 +17,9 @@ def get_apartment_ids():
     soup = BeautifulSoup(response.content, 'lxml')
    
     elements = soup.find_all('button', {'class': 'theme__button__1YqFK theme__flat__13aFK theme__button__1YqFK theme__squared__17Uvn theme__neutral__1F1Jf Button__button__3K-jn Pagination__button__3H2wX'})
-    last_element = elements[-1]
-    value = int(last_element.text.strip())
+
+    last_element = elements[-1] if elements else None
+    value = int(last_element.text.strip()) if last_element else 1
 
     # loop through all pages
     while current_page_num <= value:

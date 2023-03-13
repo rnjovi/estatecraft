@@ -1,3 +1,5 @@
+import cProfile
+import pstats
 import requests
 import lxml
 import cchardet
@@ -122,18 +124,23 @@ def sql_query(query):
     db.conn.close() 
 
 if __name__ == '__main__':
-    ids = get_apartment_ids()
+    with cProfile.Profile() as profile:
+        ids = get_apartment_ids()
 
-    create_table()
+        create_table()
 
-    # Only for 1 card
-    # data = scrape_apartment_data(ids[0])
-    # For all cards
-    c = 1
-    for id in ids:
-            data = scrape_apartment_data(id)
-            save_data(data)
-            print(c)
-            c = c + 1
+        # Only for 1 card
+        # data = scrape_apartment_data(ids[0])
+        # For all cards
+        c = 1
+        for id in ids:
+                data = scrape_apartment_data(id)
+                save_data(data)
+                print(c)
+                c = c + 1
+        
+        # sql_query("SELECT * FROM apartments")
     
-    # sql_query("SELECT * FROM apartments")
+    results = pstats.Stats(profile)
+    results.sort_stats(pstats.SortKey.TIME)
+    results.print_stats()
