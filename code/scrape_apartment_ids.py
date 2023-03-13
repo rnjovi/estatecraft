@@ -1,4 +1,5 @@
-
+import lxml
+import cchardet
 import requests
 from bs4 import BeautifulSoup
 
