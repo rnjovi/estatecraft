@@ -13,3 +13,12 @@ M1955760892
 For Hakuehdot: Pirkkala · Kerrostalo · 4h · Omistusasunto
 M1955774866
 """
+
+"""
+TODO:
+    online/offline column
+    talosivut ja niiden tiedot
+    omakotitalot pois
+    automaattinne päivittyminen
+    tietojen kerääminen tiedostoon / tietojen noutaminen aikaleimoittain.
+"""
