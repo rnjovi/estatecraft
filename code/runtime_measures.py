@@ -1,8 +1,7 @@
 from timeit import default_timer as timer
 from scrape_apartment_data import scrape_apartment_data
 from scrape_apartment_ids import get_apartment_ids
-from table_creation import create_apartments_table, save_data, filter_existing_ids
-
+from table_creation import save_data, filter_existing_ids
 
 def measure_get_apartment_ids_runtime():
     start = timer()
@@ -39,18 +38,3 @@ def measure_scrape_apartment_data_runtime(ids):
     print(f"Scraped {len(ids)} apartments")
     print(f"Average time per apartment scrape: {avg_scrape_time} seconds")
     print(f"The total time of scrape: {total_scrape_time}")
-
-def main():
-    # measure the runtime of get_apartment_ids
-    ids = measure_get_apartment_ids_runtime()
-
-    # create a table to store the scraped data
-    create_apartments_table()
-
-    # scrape data for each apartment ID
-    measure_scrape_apartment_data_runtime(ids)
-
-    # sql_query("SELECT * FROM apartments")
-
-if __name__ == '__main__':
-    main()
