@@ -3,7 +3,7 @@ import lxml
 import cchardet
 import datetime
 from bs4 import BeautifulSoup
-from scrape_apartment_ids import get_apartment_ids
+from multiprocessing import Pool
 
 def scrape_apartment_data(id):
     try:
@@ -43,29 +43,22 @@ def scrape_apartment_data(id):
         id = id
         address = extract_info(soup, 'Sijainti', None)
         type = extract_info(soup, 'Tyyppi', None)
-
         price = extract_info(soup, 'Velaton hinta', '0')
         price = convert_currency(price)
         apartment_layout = extract_info(soup, 'Huoneistoselitelmä', None)
-
         living_area = extract_info(soup, 'Asuintilojen pinta-ala', '0')
         living_area = convert_area(living_area)
-
         floors = extract_info(soup, 'Kerrokset', None)
         year_of_construction = extract_info(soup, 'Rakennusvuosi', '0')
         year_of_construction = convert_to_int(year_of_construction)
-
         selling_price = extract_info(soup, 'Myyntihinta', '0')
         selling_price = convert_currency(selling_price)
         debt_share = extract_info(soup, 'Velkaosuus', '0')
         debt_share = convert_currency(debt_share)
-
         maintenance_fee = extract_info(soup, 'Hoitovastike', '0')
         maintenance_fee = convert_fee(maintenance_fee)
-        
         financing_fee = extract_info(soup, 'Rahoitusvastike', '0')
         financing_fee  = convert_fee(financing_fee)
-
         sauna = extract_info(soup, 'Sauna', None)
         balcony = extract_info(soup, 'Parveke', None)
         elevator = extract_info(soup, 'Hissi', 'Ei hissiä')

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 def get_apartment_ids():
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
-    query_string = 'haku=M1954707357'
+    query_string = 'haku=M1955542998'
     current_page_num = 1
 
     unique_ids = set()
