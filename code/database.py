@@ -13,7 +13,7 @@ class Database:
     def execute(self, query, *args):
         try:
             cur = self.conn.cursor()
-            cur.execute(query, args)
+            cur.execute(query, *args)
             self.conn.commit()
             cur.close()
         except Exception as e:

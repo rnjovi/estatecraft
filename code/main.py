@@ -1,7 +1,7 @@
 from timeit import default_timer as timer
 from scrape_apartment_data import scrape_apartment_data
 from scrape_apartment_ids import get_apartment_ids
-from table_creation import create_table, save_data, sql_query
+from table_creation import create_apartments_table, save_data, sql_query
 
 if __name__ == '__main__':
     # measure the runtime of get_apartment_ids
@@ -15,9 +15,8 @@ if __name__ == '__main__':
     avg_time_per_id = runtime / len(ids)
     print(f"Average time per ID: {avg_time_per_id} seconds")
 
-    """
         # create a table to store the scraped data
-    create_table()
+    create_apartments_table()
 
     # scrape data for each apartment ID
     apartment_data = []
@@ -29,7 +28,7 @@ if __name__ == '__main__':
         print(c)
         c = c + 1
 
-    """
+
 
 
     # sql_query("SELECT * FROM apartments")

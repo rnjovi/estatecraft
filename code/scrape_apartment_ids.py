@@ -4,7 +4,10 @@ from concurrent.futures import ThreadPoolExecutor
 from lxml import html
 
 def create_session():
-    return requests.Session()
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'})
+    return session
 
 def get_total_pages(session, base_url, query_string):
     first_page_url = f"{base_url}?{query_string}&sivu=1"
@@ -34,11 +37,9 @@ def get_apartment_ids():
     total_pages = get_total_pages(session, base_url, query_string)
     unique_ids = []
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=12) as executor:
         fetch_and_parse = lambda page_num: fetch_and_parse_page(session, base_url, query_string, page_num)
         for new_ids in executor.map(fetch_and_parse, range(1, total_pages + 1)):
             unique_ids += new_ids
 
     return unique_ids
-
-print(get_apartment_ids())
