@@ -35,7 +35,6 @@ def convert_to_int(string):
     return int(''.join(filter(str.isdigit, string)))
 
 
-
 @dataclass
 class ApartmentInfo:
     id: str
