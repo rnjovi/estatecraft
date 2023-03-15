@@ -28,7 +28,8 @@ def convert_area(area_str):
     return float(area_str.split(" ")[0].replace(',', '.'))
 
 def convert_fee(price_str):
-    return float(price_str.split(" ")[0].replace("\xa0€", "").replace(",", "."))
+    cleaned_price_str = price_str.split(" ")[0].replace("\xa0", "").replace("€", "").replace(",", ".")
+    return float(cleaned_price_str)
 
 def convert_to_int(string):
     return int(''.join(filter(str.isdigit, string)))
@@ -109,6 +110,7 @@ def scrape_apartment_data(id):
 
     except Exception as e:
         print(e)
+        return None  # Add this line to return None in case of an exception
 
 def extract_address(soup):
     return extract_info(soup, 'Sijainti', None)

@@ -8,10 +8,10 @@ db = Database(dbname="real_estate_info", user="postgres", password="new_password
 
 def create_apartments_table():
     # Drops table for testing purposes.
-    db.execute("DROP TABLE apartments")
+    # db.execute("DROP TABLE apartments")
 
     # Creates table
-    db.execute('''CREATE TABLE apartments
+    db.execute('''CREATE TABLE IF NOT EXISTS apartments
             (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
             type TEXT,
@@ -51,20 +51,35 @@ def save_data(apartment_info):
         apartment_info.renovation_info, apartment_info.future_renovations, apartment_info.housing_company_id, apartment_info.date
     ))
 
-def sql_query(query):
+def filter_existing_ids(ids):
+    # Create an empty list to store the non-existing IDs
+    non_existing_ids = []
+
+    for id in ids:
+        # Check if the ID is in the database
+        id_check_query = "SELECT id FROM apartments WHERE id = %s"
+        rows = sql_query(id_check_query, (id,))
+
+        # If the ID is not in the database, add it to the non_existing_ids list
+        if not rows:
+            non_existing_ids.append(id)
+
+    return non_existing_ids
+
+def sql_query(query, params=None):
     # Create a cursor
     cur = db.conn.cursor()
 
-    # Execute statement
-    cur.execute(query)
+    # Execute statement with parameters if provided
+    if params:
+        cur.execute(query, params)
+    else:
+        cur.execute(query)
 
     # Fetch all rows
     rows = cur.fetchall()
 
-    # Print the rows
-    for row in rows:
-        print(row)
-
-    # Close the cursor and the database connection
+    # Close the cursor
     cur.close()
-    db.conn.close() 
+
+    return rows
