@@ -58,28 +58,10 @@ def filter_existing_ids(ids):
     for id in ids:
         # Check if the ID is in the database
         id_check_query = "SELECT id FROM apartments WHERE id = %s"
-        rows = sql_query(id_check_query, (id,))
+        row = db.fetch_one(id_check_query, (id,))
 
         # If the ID is not in the database, add it to the non_existing_ids list
-        if not rows:
+        if not row:
             non_existing_ids.append(id)
 
     return non_existing_ids
-
-def sql_query(query, params=None):
-    # Create a cursor
-    cur = db.conn.cursor()
-
-    # Execute statement with parameters if provided
-    if params:
-        cur.execute(query, params)
-    else:
-        cur.execute(query)
-
-    # Fetch all rows
-    rows = cur.fetchall()
-
-    # Close the cursor
-    cur.close()
-
-    return rows

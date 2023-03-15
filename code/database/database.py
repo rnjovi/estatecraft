@@ -1,3 +1,5 @@
+# database.py
+
 import psycopg2
 
 class Database:
@@ -19,14 +21,18 @@ class Database:
         except Exception as e:
             print(f"Error: {e}")
 
-    def fetch(self, query):
+    def fetch(self, query, *args):
         try:
             cur = self.conn.cursor()
-            cur.execute(query)
+            cur.execute(query, *args)
             results = cur.fetchall()
             cur.close()
             return results
         except Exception as e:
             print(f"Error: {e}")
 
-
+    def fetch_one(self, query, params=None):
+        with self.conn.cursor() as cur:
+            cur.execute(query, params)
+            result = cur.fetchone()
+        return result
