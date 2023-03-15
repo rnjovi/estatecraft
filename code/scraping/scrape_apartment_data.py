@@ -4,9 +4,17 @@ import cchardet
 import datetime
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
-
+from utils.utils import convert_currency, convert_area, convert_fee, convert_to_int  # Import utility functions
 
 def extract_info(soup, search_term, default=None):
+    """
+    Extract information from the soup based on the search term.
+
+    :param soup: BeautifulSoup object
+    :param search_term: The term used to search for the desired element
+    :param default: Default value if the search term is not found
+    :return: Extracted information or default value
+    """
     try:
         info = soup.find('div', string=search_term).find_next_sibling('div').text.strip()
     except AttributeError:
@@ -14,26 +22,20 @@ def extract_info(soup, search_term, default=None):
     return info
 
 def extract_link(soup, search_term, default='-'):
+    """
+    Extract a link from the soup based on the search term.
+
+    :param soup: BeautifulSoup object
+    :param search_term: The term used to search for the desired element
+    :param default: Default value if the search term is not found
+    :return: Extracted link or default value
+    """
     try:
         info = soup.find('div', string=search_term).find_next_sibling('div').find('a')['href']
         info = info.split("/")
     except (AttributeError, TypeError):
         info = default
     return info[-1]
-
-def convert_currency(currency_str):
-    return float(currency_str.replace('\xa0', '').replace(',', '.').strip('€').strip())
-
-def convert_area(area_str):
-    return float(area_str.split(" ")[0].replace(',', '.'))
-
-def convert_fee(price_str):
-    cleaned_price_str = price_str.split(" ")[0].replace("\xa0", "").replace("€", "").replace(",", ".")
-    return float(cleaned_price_str)
-
-def convert_to_int(string):
-    return int(''.join(filter(str.isdigit, string)))
-
 
 @dataclass
 class ApartmentInfo:
@@ -65,6 +67,12 @@ class ApartmentInfo:
 
 
 def scrape_apartment_data(id):
+    """
+    Scrape apartment data from the Etuovi website using the apartment's ID.
+
+    :param id: The ID of the apartment
+    :return: ApartmentInfo dataclass object containing the scraped data, or None if an exception occurs
+    """
     try:
         url = f"https://www.etuovi.com/kohde/{id}"
 
@@ -109,7 +117,7 @@ def scrape_apartment_data(id):
 
     except Exception as e:
         print(e)
-        return None  # Add this line to return None in case of an exception
+        return None  # Return None in case of an exception
 
 def extract_address(soup):
     return extract_info(soup, 'Sijainti', None)

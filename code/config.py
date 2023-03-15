@@ -11,7 +11,7 @@ TYPE_KEYWORD = "Kerrostalo"
 LOCATION_KEYWORD = "Pirkkala"
 
 # Search key for the specific search criteria used in the scraping process
-SEARCH_KEY = "M1955774866"
+SEARCH_KEY = "M1955760892"
 
 # Example search keys for different search criteria
 # For Hakuehdot: Suomi · Kerrostalo · Rivitalo · Omistusasunto

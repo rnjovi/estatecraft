@@ -4,6 +4,11 @@ from scraping.scrape_apartment_ids import get_apartment_ids
 from database.table_creation import save_data, filter_existing_ids
 
 def measure_get_apartment_ids_runtime():
+    """
+    Measure the runtime of get_apartment_ids function and return the IDs.
+
+    :return: List of apartment IDs
+    """
     start = timer()
     ids = get_apartment_ids()
     end = timer()
@@ -12,7 +17,12 @@ def measure_get_apartment_ids_runtime():
     return ids
 
 def measure_scrape_apartment_data_runtime(ids):
-    
+    """
+    Measure the runtime of scrape_apartment_data for each apartment ID,
+    print statistics, and save the data to the database.
+
+    :param ids: List of apartment IDs to scrape
+    """
     # Remove existing IDs from the list before scraping
     ids = filter_existing_ids(ids)
 
@@ -27,12 +37,12 @@ def measure_scrape_apartment_data_runtime(ids):
         start = timer()
         data = scrape_apartment_data(id)
         end = timer()
-        if data is not None:  # Define why none
+        if data is not None:  # Data is None when an exception occurs during scraping
             save_data(data)
-            
+
         total_scrape_time += (end - start)
         print(count)
-        count = count + 1
+        count += 1
 
     avg_scrape_time = total_scrape_time / len(ids)
     print(f"Scraped {len(ids)} apartments")

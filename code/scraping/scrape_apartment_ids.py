@@ -4,13 +4,21 @@ from concurrent.futures import ThreadPoolExecutor
 from lxml import html
 from config import SEARCH_KEY
 
+MAX_WORKERS = 12
+
 def create_session():
+    """
+    Create and return a new requests.Session with a custom User-Agent header.
+    """
     session = requests.Session()
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'})
     return session
 
 def get_total_pages(session, base_url, query_string):
+    """
+    Return the total number of pages for the given query string using the provided requests.Session.
+    """
     first_page_url = f"{base_url}?{query_string}&sivu=1"
     response = session.get(first_page_url)
     soup = BeautifulSoup(response.content, 'lxml')
@@ -22,6 +30,9 @@ def get_total_pages(session, base_url, query_string):
     return total_pages
 
 def fetch_and_parse_page(session, base_url, query_string, page_num):
+    """
+    Fetch a specific page and parse it to extract apartment IDs.
+    """
     current_page_url = f"{base_url}?{query_string}&sivu={page_num}"
     response = session.get(current_page_url)
     soup = BeautifulSoup(response.content, 'lxml')
@@ -31,6 +42,9 @@ def fetch_and_parse_page(session, base_url, query_string, page_num):
     return new_ids
 
 def get_apartment_ids():
+    """
+    Scrape and return a list of unique apartment IDs based on the search key from the config.
+    """
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
     query_string = 'haku=' + SEARCH_KEY
 
@@ -38,7 +52,7 @@ def get_apartment_ids():
     total_pages = get_total_pages(session, base_url, query_string)
     unique_ids = []
 
-    with ThreadPoolExecutor(max_workers=12) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         fetch_and_parse = lambda page_num: fetch_and_parse_page(session, base_url, query_string, page_num)
         for new_ids in executor.map(fetch_and_parse, range(1, total_pages + 1)):
             unique_ids += new_ids
