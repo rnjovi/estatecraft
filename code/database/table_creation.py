@@ -7,10 +7,9 @@ db = Database(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
 
 
 def create_apartments_table():
-    # Drops table for testing purposes.
-    # db.execute("DROP TABLE apartments")
-
-    # Creates table
+    """
+    Create the apartments table in the database if it does not exist.
+    """
     db.execute('''CREATE TABLE IF NOT EXISTS apartments
             (id VARCHAR(10) PRIMARY KEY,
             address TEXT,
@@ -39,7 +38,13 @@ def create_apartments_table():
             date TEXT
             )''')
 
+
 def save_data(apartment_info):
+    """
+    Save apartment information to the database.
+
+    :param apartment_info: An ApartmentInfo object containing apartment data
+    """
     query = '''INSERT INTO apartments (id, address, type, price, apartment_layout, living_area, floors, year_of_construction, selling_price, debt_share, maintenance_fee, financing_fee, sauna, balcony, elevator, condition, heating_system, housing_company, energy_class, lot_size, ownership_type, renovation_info, future_renovations, housing_company_id, date)
          VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'''
     db.execute(query, (
@@ -51,16 +56,20 @@ def save_data(apartment_info):
         apartment_info.renovation_info, apartment_info.future_renovations, apartment_info.housing_company_id, apartment_info.date
     ))
 
+
 def filter_existing_ids(ids):
-    # Create an empty list to store the non-existing IDs
+    """
+    Filter out IDs that are already present in the database.
+
+    :param ids: A list of apartment IDs
+    :return: A list of IDs not present in the database
+    """
     non_existing_ids = []
 
     for id in ids:
-        # Check if the ID is in the database
         id_check_query = "SELECT id FROM apartments WHERE id = %s"
         row = db.fetch_one(id_check_query, (id,))
 
-        # If the ID is not in the database, add it to the non_existing_ids list
         if not row:
             non_existing_ids.append(id)
 
