@@ -2,6 +2,7 @@ from utils.runtime_measures import measure_get_apartment_ids_runtime, measure_sc
 from database.table_creation import create_apartments_table
 from database.queries import run_queries
 
+
 def main():
     # measure the runtime of get_apartment_ids
     ids = measure_get_apartment_ids_runtime()

@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from lxml import html
+from config import SEARCH_KEY
 
 def create_session():
     session = requests.Session()
@@ -31,7 +32,7 @@ def fetch_and_parse_page(session, base_url, query_string, page_num):
 
 def get_apartment_ids():
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
-    query_string = 'haku=M1955742270'
+    query_string = 'haku=' + SEARCH_KEY
 
     session = create_session()
     total_pages = get_total_pages(session, base_url, query_string)

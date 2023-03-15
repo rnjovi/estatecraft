@@ -1,6 +1,6 @@
 from .database import Database
-
-db = Database(dbname="real_estate_info", user="postgres", password="new_password")
+from config import DB_NAME, DB_USER, DB_PASSWORD, TYPE_KEYWORD, LOCATION_KEYWORD
+db = Database(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
 
 def count_type_in_location(type_keyword, location_keyword):
     query = f"""SELECT COUNT(*) FROM apartments
@@ -118,8 +118,8 @@ def count_layouts_by_type(type_keyword):
     } for row in results]
 
 def run_queries():
-    type_keyword = "Kerrostalo"
-    location_keyword = "Pirkkala"
+    type_keyword = TYPE_KEYWORD
+    location_keyword = LOCATION_KEYWORD
     count = count_type_in_location(type_keyword, location_keyword)
     print()
     print(f"There are {count} apartments of type '{type_keyword}' for sale in addresses containing '{location_keyword}'.")
