@@ -31,7 +31,7 @@ def fetch_and_parse_page(session, base_url, query_string, page_num):
 
 def get_apartment_ids():
     base_url = 'https://www.etuovi.com/myytavat-asunnot'
-    query_string = 'haku=M1955731360'
+    query_string = 'haku=M1955742270'
 
     session = create_session()
     total_pages = get_total_pages(session, base_url, query_string)
