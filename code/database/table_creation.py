@@ -1,9 +1,9 @@
 from database.database import Database
-
+from config import DB_NAME, DB_USER, DB_PASSWORD
 import multiprocessing as mp
 
 # Create a new database connection
-db = Database(dbname="real_estate_info", user="postgres", password="new_password")
+db = Database(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
 
 
 def create_apartments_table():
