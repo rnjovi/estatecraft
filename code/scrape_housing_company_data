@@ -1,0 +1,35 @@
+import cProfile
+import pstats
+import requests
+import lxml
+import cchardet
+import datetime
+from bs4 import BeautifulSoup
+
+from database import Database
+from scrape_apartment_data import sql_query
+
+# Create a new database connection
+db = Database(dbname="real_estate_info", user="postgres", password="new_password")
+
+
+def create_table():
+    # Drops table for testing purposes.
+    # db.execute("DROP TABLE housing_companies")
+
+    # Creates table
+    db.execute('''CREATE TABLE housing_companies (
+                id VARCHAR(10) PRIMARY KEY,
+                name VARCHAR(255),
+                address VARCHAR(255)
+                );''')
+    
+
+if __name__ == '__main__':
+    with cProfile.Profile() as profile:
+        
+        create_table()
+    
+    results = pstats.Stats(profile)
+    results.sort_stats(pstats.SortKey.TIME)
+    results.print_stats()
